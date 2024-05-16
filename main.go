@@ -1,12 +1,22 @@
 package main
 
 import (
+	"cmp"
 	"fmt"
-	"github.com/dustin/go-humanize"
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"time"
+)
+
+//todo
+// --raw bytes option
+// -- reverse sort option
+// -- top 10 option
+
+import (
+	"github.com/dustin/go-humanize"
 )
 
 const NOEXT = "NO EXTENSION"
@@ -34,52 +44,62 @@ func main() {
 	//arg.MustParse(&args)
 	//fmt.Println(args.Dir)
 	//dir := "/home/me/temp/learngo/recapgo"
-	dir := "/home/me"
-	//dir := "/home/me/temp/learngo/testts"
+	dir := "/home/me/temp/learngo/testts2"
+	//dir := "/home/me"
 	//dir := "/home/me/temp/learngo/recapgoxxx"
 	now := time.Now()
 
 	ch := putInfo(dir)
 	rawMap := processInfoIntoRawMap(ch)
-	resultMap := rawMapToResultMap(rawMap)
-	printResultMap(resultMap)
+	resultSlice := rawMapToResultSlice(rawMap)
+	sortResultSlic(resultSlice)
+	printResultSlice(resultSlice)
 
 	fmt.Println("Elapsed ", time.Since(now))
 
 }
 
-func printResultMap(resultMap map[string]Result) {
+func sortResultSlic(resultSlice []Result) {
+	slices.SortFunc(resultSlice, func(a, b Result) int {
+		return cmp.Or(
+			cmp.Compare(a.TotalSize, b.TotalSize),
+		)
+	})
+}
+
+func printResultSlice(resultSlice []Result) {
 	fmt.Println("EXT | SIZE | NUM")
-	for k, v := range resultMap {
+	for _, v := range resultSlice {
 		//fmt.Println(k, v)
 		//fmt.Printf("%s val: %v\n", k, v)
-		fmt.Printf("%s | ", k)
+		fmt.Printf("%s | ", v.Type)
 		fmt.Printf("%v | ", v.Num)
 		fmt.Printf("%s\n", humanize.Bytes(uint64(v.TotalSize)))
 	}
 	fmt.Println()
 }
 
-func rawMapToResultMap(rawMap map[string][]FInfo) map[string]Result {
-	resultMap := make(map[string]Result)
+func rawMapToResultSlice(rawMap map[string][]FInfo) []Result {
+	var resultSlice []Result
 
+	//using worker pool pattern
 	resultsCh := make(chan Result, len(rawMap))
 	defer close(resultsCh)
 
 	for k, v := range rawMap {
-		if _, ok := resultMap[k]; !ok {
-			resultMap[k] = Result{}
-		}
 		go func(k string, v []FInfo) {
 			resultsCh <- finfoSliceToResult(k, v)
 		}(k, v)
 	}
+	//note how we don't use range but the len of teh jobs
 	for a := 0; a < len(rawMap); a++ {
 		v := <-resultsCh
-		resultMap[v.Type] = v
+		//resultMap[v.Type] = v
+		resultSlice = append(resultSlice, v)
+
 	}
 
-	return resultMap
+	return resultSlice
 }
 
 func finfoSliceToResult(fType string, fSlice []FInfo) Result {
