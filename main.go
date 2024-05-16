@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"time"
 )
 
 const NOEXT = "NO EXTENSION"
@@ -31,14 +32,18 @@ func main() {
 	//}
 	//arg.MustParse(&args)
 	//fmt.Println(args.Dir)
-	dir := "/home/me/temp/learngo/recapgo"
+	//dir := "/home/me/temp/learngo/recapgo"
+	dir := "/home/me"
 	//dir := "/home/me/temp/learngo/testts"
 	//dir := "/home/me/temp/learngo/recapgoxxx"
+	now := time.Now()
 
 	ch := putInfo(dir)
 	rawMap := processInfoIntoRawMap(ch)
 	resultMap := rawMapToResultMap(rawMap)
 	printResultMap(resultMap)
+
+	fmt.Println("Elapsed ", time.Since(now))
 
 }
 
@@ -67,6 +72,7 @@ func rawMapToResultMap(rawMap map[string][]FInfo) map[string]Result {
 
 func finfoSliceToResult(fType string, fSlice []FInfo) Result {
 	res := Result{}
+
 	for _, v := range fSlice {
 		if v.Err != nil {
 			continue
