@@ -21,6 +21,7 @@ type FInfo struct {
 }
 
 type Result struct {
+	Type            string
 	TotalSize       int64
 	Num             uint64
 	Top5FilesBySize []FInfo
@@ -53,25 +54,39 @@ func printResultMap(resultMap map[string]Result) {
 		//fmt.Println(k, v)
 		//fmt.Printf("%s val: %v\n", k, v)
 		fmt.Printf("%s | ", k)
-		fmt.Printf("%s | ", humanize.Bytes(uint64(v.TotalSize)))
-		fmt.Printf("%v\n", v.Num)
+		fmt.Printf("%v | ", v.Num)
+		fmt.Printf("%s\n", humanize.Bytes(uint64(v.TotalSize)))
 	}
 	fmt.Println()
 }
 
 func rawMapToResultMap(rawMap map[string][]FInfo) map[string]Result {
 	resultMap := make(map[string]Result)
+
+	resultsCh := make(chan Result, len(rawMap))
+	defer close(resultsCh)
+
 	for k, v := range rawMap {
 		if _, ok := resultMap[k]; !ok {
 			resultMap[k] = Result{}
 		}
-		resultMap[k] = finfoSliceToResult(k, v)
+		go func(k string, v []FInfo) {
+			resultsCh <- finfoSliceToResult(k, v)
+		}(k, v)
 	}
+	for a := 0; a < len(rawMap); a++ {
+		v := <-resultsCh
+		resultMap[v.Type] = v
+	}
+
 	return resultMap
 }
 
 func finfoSliceToResult(fType string, fSlice []FInfo) Result {
 	res := Result{}
+	if len(fSlice) > 0 {
+		res.Type = path.Ext(fSlice[0].Name)
+	}
 
 	for _, v := range fSlice {
 		if v.Err != nil {
