@@ -14,6 +14,7 @@ import (
 // --raw bytes option
 // -- reverse sort option
 // -- top 10 option
+// --summary option
 
 import (
 	"github.com/dustin/go-humanize"
@@ -44,8 +45,9 @@ func main() {
 	//arg.MustParse(&args)
 	//fmt.Println(args.Dir)
 	//dir := "/home/me/temp/learngo/recapgo"
-	dir := "/home/me/temp/learngo/testts2"
+	//dir := "/home/me/temp/learngo/testts2"
 	//dir := "/home/me"
+	dir := "/usr"
 	//dir := "/home/me/temp/learngo/recapgoxxx"
 	now := time.Now()
 
