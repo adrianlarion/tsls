@@ -19,7 +19,7 @@ import (
 	"github.com/dustin/go-humanize"
 )
 
-const NOEXT = "NO EXTENSION"
+const NOEXT = "__NOEXT__"
 
 //Takes a dir as arg
 //displays categorized information about size, type, etc
@@ -105,7 +105,7 @@ func rawMapToResultSlice(rawMap map[string][]FInfo) []Result {
 func finfoSliceToResult(fType string, fSlice []FInfo) Result {
 	res := Result{}
 	if len(fSlice) > 0 {
-		res.Type = path.Ext(fSlice[0].Name)
+		res.Type = fType
 	}
 
 	for _, v := range fSlice {
