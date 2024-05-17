@@ -12,7 +12,7 @@ import (
 )
 
 //todo
-// --raw bytes option
+// --raw bytes option X
 // -- reverse sort option
 // -- top 10 option
 // --summary option
@@ -41,8 +41,9 @@ type Result struct {
 
 func main() {
 	var args struct {
-		Dir   string `arg:"positional" help:"target directory"`
-		Bytes bool   `arg:"-b, --bytes" help:"show bytes instead of human readable size"`
+		Dir     string `arg:"positional" help:"target directory"`
+		Bytes   bool   `arg:"-b, --bytes" help:"show bytes instead of human readable size"`
+		Reverse bool   `arg:"-r, --reverse" help:"reverse sort"`
 	}
 	arg.MustParse(&args)
 
@@ -67,18 +68,26 @@ func main() {
 	ch := putInfo(args.Dir)
 	rawMap := processInfoIntoRawMap(ch)
 	resultSlice := rawMapToResultSlice(rawMap)
-	sortResultSlic(resultSlice)
+	sortResultSlic(resultSlice, args.Reverse)
 	printResultSlice(resultSlice, args.Bytes)
 
 	fmt.Println("Elapsed ", time.Since(now))
 
 }
 
-func sortResultSlic(resultSlice []Result) {
+func sortResultSlic(resultSlice []Result, reverse bool) {
+
 	slices.SortFunc(resultSlice, func(a, b Result) int {
-		return cmp.Or(
-			cmp.Compare(a.TotalSize, b.TotalSize),
-		)
+		if reverse {
+			return cmp.Or(
+				-cmp.Compare(a.TotalSize, b.TotalSize),
+			)
+
+		} else {
+			return cmp.Or(
+				cmp.Compare(a.TotalSize, b.TotalSize),
+			)
+		}
 	})
 }
 
