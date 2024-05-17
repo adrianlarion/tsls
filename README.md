@@ -1,8 +1,9 @@
 # About
 
-![usageg anim](./docs/usage_anim.svg)
+![usageg anim](./docs/anim.svg)
 
-Displays categorized information about file terminations, num of files and total size
+Displays categorized information about file terminations, num of files and total size.
+It's pretty fast, using go's concurrency capabilities.
 Sorts by showing the largest size last.
 It shows 3 columns: 
 
