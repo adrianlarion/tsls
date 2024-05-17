@@ -41,8 +41,8 @@ type Result struct {
 
 func main() {
 	var args struct {
-		Dir   string `arg:"positional"`
-		Bytes bool   `arg:"-b, --bytes"`
+		Dir   string `arg:"positional" help:"target directory"`
+		Bytes bool   `arg:"-b, --bytes" help:"show bytes instead of human readable size"`
 	}
 	arg.MustParse(&args)
 
