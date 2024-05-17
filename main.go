@@ -3,6 +3,7 @@ package main
 import (
 	"cmp"
 	"fmt"
+	"github.com/alexflint/go-arg"
 	"os"
 	"path"
 	"path/filepath"
@@ -39,23 +40,35 @@ type Result struct {
 }
 
 func main() {
-	//var args struct {
-	//	Dir string `arg:"positional, required"`
-	//}
-	//arg.MustParse(&args)
+	var args struct {
+		Dir   string `arg:"positional"`
+		Bytes bool   `arg:"-b, --bytes"`
+	}
+	arg.MustParse(&args)
+
 	//fmt.Println(args.Dir)
 	//dir := "/home/me/temp/learngo/recapgo"
 	//dir := "/home/me/temp/learngo/testts2"
 	//dir := "/home/me"
-	dir := "/usr"
+	//dir := "/usr"
 	//dir := "/home/me/temp/learngo/recapgoxxx"
 	now := time.Now()
 
-	ch := putInfo(dir)
+	//if no dir supplied, use current dir
+	if len(args.Dir) == 0 {
+		ex, err := os.Executable()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		args.Dir = filepath.Dir(ex)
+	}
+
+	ch := putInfo(args.Dir)
 	rawMap := processInfoIntoRawMap(ch)
 	resultSlice := rawMapToResultSlice(rawMap)
 	sortResultSlic(resultSlice)
-	printResultSlice(resultSlice)
+	printResultSlice(resultSlice, args.Bytes)
 
 	fmt.Println("Elapsed ", time.Since(now))
 
@@ -69,14 +82,20 @@ func sortResultSlic(resultSlice []Result) {
 	})
 }
 
-func printResultSlice(resultSlice []Result) {
+func printResultSlice(resultSlice []Result, bytes bool) {
 	fmt.Println("EXT | SIZE | NUM")
 	for _, v := range resultSlice {
+		//show either human readable or bytes
+		size := humanize.Bytes(uint64(v.TotalSize))
+		if bytes {
+			size = fmt.Sprintf("%v", v.TotalSize)
+		}
+
 		//fmt.Println(k, v)
 		//fmt.Printf("%s val: %v\n", k, v)
 		fmt.Printf("%s | ", v.Type)
 		fmt.Printf("%v | ", v.Num)
-		fmt.Printf("%s\n", humanize.Bytes(uint64(v.TotalSize)))
+		fmt.Printf("%s\n", size)
 	}
 	fmt.Println()
 }
