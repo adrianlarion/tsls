@@ -2,13 +2,25 @@
 
 ![usageg anim](./docs/usage_anim.svg)
 
-Displays categorized information about file terminations, their total size and total number
+Displays categorized information about file terminations, num of files and total size
 Sorts by showing the largest size last.
 It shows 3 columns: 
+
+
+
+
 ![columns](./docs/categories.png)
+
+
+
+
 * termination
 * number of files using that termination 
 * total size of files with that termination 
+
+
+
+
 
 __NOEXT__ termination means that the files have no termination, probably binaries
 
