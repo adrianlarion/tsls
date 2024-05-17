@@ -1,30 +1,20 @@
 package main
 
+//Takes a dir as arg
+//displays categorized information about size, type, etc
+
 import (
 	"cmp"
 	"fmt"
 	"github.com/alexflint/go-arg"
+	"github.com/dustin/go-humanize"
 	"os"
 	"path"
 	"path/filepath"
 	"slices"
-	"time"
-)
-
-//todo
-// --raw bytes option X
-// -- reverse sort option
-// -- top 10 option
-// --summary option
-
-import (
-	"github.com/dustin/go-humanize"
 )
 
 const NOEXT = "__NOEXT__"
-
-//Takes a dir as arg
-//displays categorized information about size, type, etc
 
 type FInfo struct {
 	Bytes int64
@@ -47,13 +37,7 @@ func main() {
 	}
 	arg.MustParse(&args)
 
-	//fmt.Println(args.Dir)
-	//dir := "/home/me/temp/learngo/recapgo"
-	//dir := "/home/me/temp/learngo/testts2"
-	//dir := "/home/me"
-	//dir := "/usr"
-	//dir := "/home/me/temp/learngo/recapgoxxx"
-	now := time.Now()
+	//now := time.Now()
 
 	//if no dir supplied, use current dir
 	if len(args.Dir) == 0 {
@@ -71,7 +55,7 @@ func main() {
 	sortResultSlic(resultSlice, args.Reverse)
 	printResultSlice(resultSlice, args.Bytes)
 
-	fmt.Println("Elapsed ", time.Since(now))
+	//fmt.Println("Elapsed ", time.Since(now))
 
 }
 
@@ -92,7 +76,7 @@ func sortResultSlic(resultSlice []Result, reverse bool) {
 }
 
 func printResultSlice(resultSlice []Result, bytes bool) {
-	fmt.Println("EXT | SIZE | NUM")
+	//fmt.Println("EXT | SIZE | NUM")
 	for _, v := range resultSlice {
 		//show either human readable or bytes
 		size := humanize.Bytes(uint64(v.TotalSize))
@@ -100,13 +84,10 @@ func printResultSlice(resultSlice []Result, bytes bool) {
 			size = fmt.Sprintf("%v", v.TotalSize)
 		}
 
-		//fmt.Println(k, v)
-		//fmt.Printf("%s val: %v\n", k, v)
 		fmt.Printf("%s | ", v.Type)
 		fmt.Printf("%v | ", v.Num)
 		fmt.Printf("%s\n", size)
 	}
-	fmt.Println()
 }
 
 func rawMapToResultSlice(rawMap map[string][]FInfo) []Result {
