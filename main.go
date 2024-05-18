@@ -47,6 +47,12 @@ func main() {
 			return
 		}
 		args.Dir = filepath.Dir(ex)
+	} else {
+		//check if dir exists
+		if _, err := os.Stat(args.Dir); err != nil {
+			fmt.Println(err)
+			return
+		}
 	}
 
 	ch := putInfo(args.Dir)
